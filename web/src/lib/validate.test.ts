@@ -7,13 +7,21 @@ describe("parseXlmAmount", () => {
     expect(parseXlmAmount("12,5")).toEqual({ ok: true, value: 12.5 });
     expect(parseXlmAmount("0.0000001")).toEqual({ ok: true, value: 0.0000001 });
   });
+  it("rejects ambiguous thousands-shaped decimal separators", () => {
+    for (const input of ["1,000", "1.000"]) {
+      expect(parseXlmAmount(input)).toEqual({
+        ok: false,
+        msg: `The value "${input}" is ambiguous; write 1000 for one thousand or 1.0 for one.`,
+      });
+    }
+  });
   it("trims surrounding whitespace", () => {
     expect(parseXlmAmount("  3 ")).toEqual({ ok: true, value: 3 });
   });
   it("rejects values below one stroop and precision finer than seven decimals", () => {
     expect(parseXlmAmount("0.00000001")).toEqual({
       ok: false,
-      msg: "Enter a valid amount greater than zero (minimum 0.0000001 XLM; up to 7 decimal places).",
+      msg: "Enter a valid amount greater than zero (up to 7 decimal places).",
     });
     expect(parseXlmAmount("1.00000001").ok).toBe(false);
   });
@@ -50,7 +58,7 @@ describe("parseOptionalXlmAmount", () => {
     expect(parseOptionalXlmAmount("-5").ok).toBe(false);
     expect(parseOptionalXlmAmount("abc", "starting funds")).toEqual({
       ok: false,
-      msg: "Enter a valid starting funds greater than zero (minimum 0.0000001 XLM; up to 7 decimal places).",
+      msg: "Enter a valid starting funds greater than zero (up to 7 decimal places).",
     });
   });
 });

@@ -7,6 +7,7 @@ import { StrKey } from "@stellar/stellar-sdk";
 export type AmountResult = { ok: true; value: number } | { ok: false; msg: string };
 
 const XLM_AMOUNT_PATTERN = /^\d+(?:[.,]\d{1,7})?$/;
+const AMBIGUOUS_THOUSANDS_PATTERN = /^\d{1,3}[.,]\d{3}$/;
 
 /** Parse decimal XLM input without accepting Number()'s hex or exponent forms. */
 function parseXlmValue(raw: string): number | undefined {
@@ -27,6 +28,12 @@ function invalidXlmAmount(label: string): AmountResult {
 export function parseXlmAmount(raw: string, label = "amount"): AmountResult {
   const s = raw.trim();
   if (!s) return { ok: false, msg: `Enter ${aOrAn(label)}.` };
+  if (AMBIGUOUS_THOUSANDS_PATTERN.test(s)) {
+    return {
+      ok: false,
+      msg: `The value "${s}" is ambiguous; write 1000 for one thousand or 1.0 for one.`,
+    };
+  }
   const value = parseXlmValue(s);
   if (value === undefined || value <= 0) return invalidXlmAmount(label);
   return { ok: true, value };

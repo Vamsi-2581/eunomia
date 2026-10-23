@@ -19,7 +19,7 @@ function parseXlmValue(raw: string): number | undefined {
 function invalidXlmAmount(label: string): AmountResult {
   return {
     ok: false,
-    msg: `Enter a valid ${label} greater than zero (minimum 0.0000001 XLM; up to 7 decimal places).`,
+    msg: `Enter a valid ${label} greater than zero (up to 7 decimal places).`,
   };
 }
 
